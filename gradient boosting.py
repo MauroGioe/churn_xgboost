@@ -65,30 +65,19 @@ X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.
 
 train, validate, test = np.split(X.sample(frac=1), [int(.6*len(X)), int(.8*len(X))])#60%20%20%
 custom_scorer = make_scorer(fbeta_score, beta=2, pos_label="Yes")
-
-
-
-X_train_ori=X_train
-X_train=X_preprocessing.fit_transform(X_train)
-X_cols=X_preprocessing.transformers_[0][1].named_steps["onehot"].get_feature_names_out(categorical_cols).tolist()
-X_train=pd.DataFrame(X_train, columns=X_cols)
-
-
-X_val_ori=X_val
-X_val=X_preprocessing.fit_transform(X_val)
-X_cols=X_preprocessing.transformers_[0][1].named_steps["onehot"].get_feature_names_out(categorical_cols).tolist()
-X_val=pd.DataFrame(X_val, columns=X_cols)
-
-
-X_test_ori=X_test
-X_test=X_preprocessing.fit_transform(X_test)
-X_cols=X_preprocessing.transformers_[0][1].named_steps["onehot"].get_feature_names_out(categorical_cols).tolist()
-X_test=pd.DataFrame(X_test, columns=X_cols)
-
 scaler = StandardScaler()
-X_train[["tenure","MonthlyCharges","TotalCharges"]]=scaler.fit_transform(X_train_ori[["tenure","MonthlyCharges","TotalCharges"]])
-X_test[["tenure","MonthlyCharges","TotalCharges"]]=scaler.fit_transform(X_test_ori[["tenure","MonthlyCharges","TotalCharges"]])
-X_val[["tenure","MonthlyCharges","TotalCharges"]]=scaler.fit_transform(X_val_ori[["tenure","MonthlyCharges","TotalCharges"]])
+
+def get_back_ori_transform_df(X,numeric_cols=["tenure","MonthlyCharges","TotalCharges"]):
+    X_ori = X
+    X = X_preprocessing.fit_transform(X)
+    X_cols = X_preprocessing.transformers_[0][1].named_steps["onehot"].get_feature_names_out(categorical_cols).tolist()
+    X = pd.DataFrame(X, columns=X_cols)
+    X[numeric_cols] = scaler.fit_transform(X_ori[numeric_cols])
+    return X_ori, X
+
+X_train_ori, X_train = get_back_ori_transform_df(X_train)
+X_val_ori, X_val = get_back_ori_transform_df(X_val)
+X_test_ori, X_test = get_back_ori_transform_df(X_test)
 
 
 # endregion
