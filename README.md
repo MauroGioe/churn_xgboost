@@ -1,3 +1,3 @@
 # churn_xgboost
 
-Project that identifies top reason clients tends to or not to churn in a TELCO setting
+Project that identifies the top reasons for which clients tend to or not to churn in a TELCO setting
